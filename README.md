@@ -1,2 +1,2 @@
-Buscador Crawler\n
+Buscador Crawler
 Integrantes: Luana, Lina, Meir e Teresa
