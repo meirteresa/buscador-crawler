@@ -43,6 +43,11 @@ app.post('/buscar', async (req, res) => {
             return 0;
         });
 
+        // ✅ Verifica se encontrou algum resultado
+        if (resultadosOrdenados.length === 0) {
+            return res.status(200).json({ mensagem: "Sua pesquisa não encontrou nenhum documento correspondente." });
+        }
+        
         // Retorna os resultados ordenados para o front-end
         res.json(resultadosOrdenados);
     } catch (erro) {
