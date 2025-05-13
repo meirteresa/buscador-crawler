@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Buscador de Páginas</h1>
+        <form id="buscaForm">
+            <input type="text" id="url" placeholder="Digite a URL de início" required />
+            <input type="text" id="termos" placeholder="Digite os termos de busca" required />
+            <button type="submit">Buscar</button>
+        </form>
+
+        <div id="resultados"></div>
+    </div>
+
+    <script>
+      document.getElementById('buscaForm').addEventListener('submit', async function(event) {
+          event.preventDefault();
+  
+          const url = document.getElementById('url').value;
+          const termos = document.getElementById('termos').value.split(',').map(t => t.trim());
+  
+          try {
+              const response = await fetch('/buscar', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ url, termos })
+              });
+  
+              if (!response.ok) throw new Error('Erro ao buscar resultados');
+  
+              const resultados = await response.json();
+  
+              let tabela = `
+                  <table border="1" cellpadding="6" cellspacing="0">
+                      <thead>
+                          <tr>
+                              <th>Posição</th>
+                              <th>Página</th>
+                              <th>Ocorrências (+5)</th>
+                              <th>Links Recebidos (+10)</th>
+                              <th>Autorreferência (-15)</th>
+                              <th>Total</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+              `;
+  
+              resultados.forEach((result, index) => {
+    tabela += `
+        <tr>
+            <td>${index + 1}</td>
+            <td><a href="${result.url}" target="_blank">${result.url}</a></td>
+            <td>${result.ocorrencias} x 5 = ${result.ocorrencias * 5}</td>
+            <td>${result.linksRecebidos * 10}</td>
+            <td>${result.autoreferencia ? '-15' : '0'}</td>
+            <td>${result.total}</td>
+        </tr>
+    `;
+});
+
+  
+              tabela += '</tbody></table>';
+              document.getElementById('resultados').innerHTML = tabela;
+  
+          } catch (erro) {
+              console.error('Erro:', erro);
+              document.getElementById('resultados').innerHTML = '<p>Erro ao buscar resultados.</p>';
+          }
+      });
+  </script>
+  
+</body>
+</html>
