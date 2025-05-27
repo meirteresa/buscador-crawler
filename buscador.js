@@ -13,18 +13,17 @@ function ranquearPaginas(paginas, termosBuscados) {
     // 1. Contar links recebidos e verificar autoreferência
     paginas.forEach(pagina => {
         pagina.links.forEach(link => {
-            const destino = link.href;
+        const destino = link.href;
 
-            if (destino === pagina.url) {
-                resultado[destino].autoreferencia = true;
-            } else {
-                resultado[destino].linksRecebidos += 1;
-            }
+        if (destino === pagina.url) {
+            resultado[destino].autoreferencia = true;
+            return;
+        }
 
-            // if (resultado[destino] !== undefined) { 
-            // }
+        if (resultado[destino] !== undefined) {
+            resultado[destino].linksRecebidos += 1;
+        }
         });
-
     });
 
     // 2. Contar ocorrências dos termos buscados
