@@ -40,6 +40,10 @@ app.post('/buscar', async (req, res) => {
 
         resultadosOrdenados.sort((a, b) => b.total - a.total);
 
+        if (resultadosOrdenados.length === 0) {
+            return res.status(200).json({ mensagem: "Sua pesquisa não encontrou nenhum documento correspondente." });
+        }
+
         res.json(resultadosOrdenados);
     } catch (erro) {
         console.error('Erro ao realizar busca:', erro);
