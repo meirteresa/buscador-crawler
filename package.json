@@ -1,15 +1,23 @@
 {
   "name": "buscador-crawler",
   "version": "1.0.0",
+  "description": "Integrantes: Luana, Lina, Meir e Teresa",
   "main": "buscador.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meirteresa/buscador-crawler.git"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "bugs": {
+    "url": "https://github.com/meirteresa/buscador-crawler/issues"
+  },
+  "homepage": "https://github.com/meirteresa/buscador-crawler#readme",
   "dependencies": {
     "axios": "^1.9.0",
     "cheerio": "^1.0.0",

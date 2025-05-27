@@ -12,7 +12,7 @@
     <div class="container">
         <h1>Buscador de Páginas</h1>
         <form id="buscaForm">
-            <input type="text" id="url" placeholder="Digite a URL de início" required />
+            <!-- <input type="text" id="url" placeholder="Digite a URL de início" required /> -->
             <input type="text" id="termos" placeholder="Digite o termo de busca" required />
             <button type="submit">Buscar</button>
         </form>
@@ -24,7 +24,7 @@
         document.getElementById('buscaForm').addEventListener('submit', async function (event) {
             event.preventDefault();
 
-            const url = document.getElementById('url').value;
+            const url = 'https://meirteresa.github.io/sites/matrix.html'
             const termos = document.getElementById('termos').value.split(',').map(t => t.trim());
 
             try {
