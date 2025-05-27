@@ -12,7 +12,6 @@
     <div class="container">
         <h1>Buscador de Páginas</h1>
         <form id="buscaForm">
-            <!-- <input type="text" id="url" placeholder="Digite a URL de início" required /> -->
             <input type="text" id="termos" placeholder="Digite o termo de busca" required />
             <button type="submit">Buscar</button>
         </form>
@@ -67,7 +66,7 @@
         <tr>
             <td>${index + 1}</td>
             <td><a href="${result.url}" target="_blank">${result.url}</a></td>
-            <td>${result.ocorrencias} x 5 = ${result.ocorrencias * 5}</td>
+            <td>${result.ocorrencias * 5}</td>
             <td>${result.linksRecebidos * 10}</td>
             <td>${result.autoreferencia ? '-15' : '0'}</td>
             <td>${result.total}</td>

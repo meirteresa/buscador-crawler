@@ -31,19 +31,15 @@ app.post('/buscar', async (req, res) => {
         }));
 
 
-        resultadosOrdenados.sort((a, b) => {
-            const pa = a;
-            const pb = b;
-
+        resultadosOrdenados.sort((pa, pb) => {
             if (pb.total !== pa.total) return pb.total - pa.total;
-            if (pb.termosEncontrados !== pa.termosEncontrados) return pb.termosEncontrados - pa.termosEncontrados;
             if (pb.linksRecebidos !== pa.linksRecebidos) return pb.linksRecebidos - pa.linksRecebidos;
             if (pa.autoreferencia !== pb.autoreferencia) return pa.autoreferencia ? 1 : -1;
+            if (pb.ocorrencias !== pa.ocorrencias) return pb.ocorrencias - pa.ocorrencias;
 
             return 0;
         });
 
-        // ✅ Verifica se encontrou algum resultado
         if (resultadosOrdenados.length === 0) {
             return res.status(200).json({ mensagem: "Sua pesquisa não encontrou nenhum documento correspondente." });
         }

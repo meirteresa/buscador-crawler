@@ -15,13 +15,14 @@ function ranquearPaginas(paginas, termosBuscados) {
         pagina.links.forEach(link => {
             const destino = link.href;
 
-            if (resultado[destino] !== undefined) {
+            if (destino === pagina.url) {
+                resultado[destino].autoreferencia = true;
+            } else {
                 resultado[destino].linksRecebidos += 1;
             }
 
-            if (destino === pagina.url) {
-                resultado[destino].autoreferencia = true;
-            }
+            // if (resultado[destino] !== undefined) { 
+            // }
         });
 
     });
