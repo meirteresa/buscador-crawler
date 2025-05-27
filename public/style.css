@@ -5,6 +5,7 @@ body {
 }
 
 .container {
+  min-height: 400px;
   max-width: 900px;
   margin: 0 auto;
 }
@@ -32,11 +33,18 @@ button {
   padding: 10px;
   font-size: 16px;
   cursor: pointer;
+  margin: 20px auto 0 auto;
+}
+
+#reiniciar {
+  margin: 20px auto 0 auto;
+  display: none;
 }
 
 table {
   width: 100%;
   margin-top: 20px;
+  margin-bottom: 70px;
   border-collapse: collapse;
   text-align: left;
 }
@@ -55,21 +63,4 @@ th {
 
 tr:nth-child(even) {
   background-color: #f9f9f9;
-}
-
-.mensagem-erro {
-  text-align: center;
-  font-size: 22px;
-  font-weight: bold;
-  margin-top: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  color: inherit;
-}
-
-.icone-erro {
-  color: #cc0000;
-  font-size: 24px;
 }
