@@ -10,18 +10,28 @@ const port = 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Endpoint de busca
-app.post('/buscar', async (req, res) => {
-    const { url, termos } = req.body;
+let paginasArmazenadas = []; // 🟡 guarda as páginas após o crawl
+
+// ✅ Rota para carregar as páginas (etapa 1)
+app.post('/carregar', async (req, res) => {
+    const { url } = req.body;
 
     try {
-        // Roda o crawler para coletar as páginas a partir da URL fornecida
-        const paginas = await crawlPagina(url);
+        paginasArmazenadas = await crawlPagina(url);
+        res.sendStatus(200);
+    } catch (erro) {
+        console.error('Erro ao carregar páginas:', erro);
+        res.status(500).send('Erro ao carregar páginas');
+    }
+});
 
-        // Roda o ranqueamento das páginas
-        const ranking = ranquearPaginas(paginas, termos);
+// ✅ Rota para buscar os termos (etapa 2)
+app.post('/buscar', async (req, res) => {
+    const { termos } = req.body;
 
-        // Ordena os resultados
+    try {
+        const ranking = ranquearPaginas(paginasArmazenadas, termos);
+
         const resultadosOrdenados = Object.keys(ranking).map(url => ({
             url,
             ocorrencias: ranking[url].termosEncontrados,
@@ -30,21 +40,12 @@ app.post('/buscar', async (req, res) => {
             total: ranking[url].total
         }));
 
-
-        resultadosOrdenados.sort((pa, pb) => {
-            if (pb.total !== pa.total) return pb.total - pa.total;
-            if (pb.linksRecebidos !== pa.linksRecebidos) return pb.linksRecebidos - pa.linksRecebidos;
-            if (pa.autoreferencia !== pb.autoreferencia) return pa.autoreferencia ? 1 : -1;
-            if (pb.ocorrencias !== pa.ocorrencias) return pb.ocorrencias - pa.ocorrencias;
-
-            return 0;
-        });
+        resultadosOrdenados.sort((a, b) => b.total - a.total);
 
         if (resultadosOrdenados.length === 0) {
             return res.status(200).json({ mensagem: "Sua pesquisa não encontrou nenhum documento correspondente." });
         }
-        
-        // Retorna os resultados ordenados para o front-end
+
         res.json(resultadosOrdenados);
     } catch (erro) {
         console.error('Erro ao realizar busca:', erro);
@@ -52,7 +53,7 @@ app.post('/buscar', async (req, res) => {
     }
 });
 
-// Inicia o servidor na porta 3000
+// ✅ Iniciar servidor
 app.listen(port, () => {
     console.log(`Servidor rodando na porta ${port}`);
 });
