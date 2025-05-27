@@ -10,9 +10,8 @@ const port = 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-let paginasArmazenadas = []; // 🟡 guarda as páginas após o crawl
+let paginasArmazenadas = []; //guarda as páginas após o crawl
 
-// ✅ Rota para carregar as páginas (etapa 1)
 app.post('/carregar', async (req, res) => {
     const { url } = req.body;
 
@@ -25,7 +24,6 @@ app.post('/carregar', async (req, res) => {
     }
 });
 
-// ✅ Rota para buscar os termos (etapa 2)
 app.post('/buscar', async (req, res) => {
     const { termos } = req.body;
 
@@ -53,7 +51,6 @@ app.post('/buscar', async (req, res) => {
     }
 });
 
-// ✅ Iniciar servidor
 app.listen(port, () => {
     console.log(`Servidor rodando na porta ${port}`);
 });
