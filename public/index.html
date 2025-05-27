@@ -1,90 +1,138 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscador</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Buscador</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-    <div class="container">
-        <h1>Buscador de Páginas</h1>
-        <form id="buscaForm">
-            <input type="text" id="termos" placeholder="Digite o termo de busca" required />
-            <button type="submit">Buscar</button>
-        </form>
+  <div class="container">
+    <h1>Buscador de Páginas</h1>
 
-        <div id="resultados"></div>
-    </div>
+    <!-- Formulário de URL -->
+    <form id="urlForm">
+      <input type="text" id="url" placeholder="Digite a URL de início" required />
+      <button type="submit">Carregar Páginas</button>
+    </form>
 
-    <script>
-        document.getElementById('buscaForm').addEventListener('submit', async function (event) {
-            event.preventDefault();
+    <!-- Formulário de termos -->
+    <form id="termoForm" style="display: none;">
+      <input type="text" id="termos" placeholder="Digite os termos de busca" required />
+      <button type="submit">Buscar</button>
+    </form>
 
-            const url = 'https://meirteresa.github.io/sites/matrix.html'
-            const termos = document.getElementById('termos').value.split(',').map(t => t.trim());
+    <div id="status"></div>
+    <div id="resultados"></div>
+    <button type="button" id="reiniciar">🔁 Reiniciar Busca</button>
+  </div>
 
-            try {
-                const response = await fetch('/buscar', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ url, termos })
-                });
+  <script>
+    let paginasCarregadas = false;
 
-                if (!response.ok) throw new Error('Erro ao buscar resultados');
+    // Carregar páginas a partir da URL
+    document.getElementById('urlForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const url = document.getElementById('url').value;
 
-                const resultados = await response.json();
+      document.getElementById('status').innerText = '🔄 Carregando páginas...';
+      document.getElementById('resultados').innerHTML = '';
 
-                const resultadosDiv = document.getElementById('resultados');
-
-                if (resultados.mensagem) {
-                    resultadosDiv.innerHTML = `<p class="mensagem-erro"><span class="icone-erro">&#10060;</span> ${resultados.mensagem}</p>`;
-                    return;
-                }
-
-                let tabela = `
-                    <table border="1" cellpadding="6" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th>Posição</th>
-                                <th>Página</th>
-                                <th>Ocorrências (+5)</th>
-                                <th>Links Recebidos (+10)</th>
-                                <th>Autorreferência (-15)</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                resultados.forEach((result, index) => {
-                    tabela += `
-        <tr>
-            <td>${index + 1}</td>
-            <td><a href="${result.url}" target="_blank">${result.url}</a></td>
-            <td>${result.ocorrencias * 5}</td>
-            <td>${result.linksRecebidos * 10}</td>
-            <td>${result.autoreferencia ? '-15' : '0'}</td>
-            <td>${result.total}</td>
-        </tr>
-    `;
-                });
-
-
-                tabela += '</tbody></table>';
-                document.getElementById('resultados').innerHTML = tabela;
-
-            } catch (erro) {
-                console.error('Erro:', erro);
-                document.getElementById('resultados').innerHTML = '<p>Erro ao buscar resultados.</p>';
-            }
+      try {
+        const res = await fetch('/carregar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
         });
-    </script>
 
+        if (!res.ok) throw new Error('Erro ao carregar páginas.');
+
+        document.getElementById('status').innerText = '✅ Páginas carregadas com sucesso!';
+        document.getElementById('termoForm').style.display = 'block';
+        document.getElementById('urlForm').style.display = 'none';
+        paginasCarregadas = true;
+
+      } catch (err) {
+        document.getElementById('status').innerText = '❌ Erro ao carregar páginas.';
+        console.error(err);
+      }
+    });
+
+    // Buscar termos
+    document.getElementById('termoForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const termos = document.getElementById('termos').value.split(',').map(t => t.trim());
+      document.getElementById('status').innerText = '🔍 Buscando termos...';
+
+      try {
+        const res = await fetch('/buscar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ termos })
+        });
+
+        if (!res.ok) throw new Error('Erro ao buscar');
+
+        const resultados = await res.json();
+
+        if (!Array.isArray(resultados)) {
+            document.getElementById('resultados').innerHTML = `<p></p>`;
+            document.getElementById('status').innerText = '❌ Sua pesquisa não encontrou nenhum resultado correspondente para os termos fornecidos.';
+            document.getElementById('reiniciar').style.display = 'block';
+            return;
+        }
+
+        let tabela = `
+          <table border="1" cellpadding="6" cellspacing="0">
+            <thead>
+              <tr>
+                <th>Posição</th>
+                <th>Página</th>
+                <th>Ocorrências (+5)</th>
+                <th>Links Recebidos (+10)</th>
+                <th>Autorreferência (-15)</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        resultados.forEach((result, index) => {
+          tabela += `
+            <tr>
+              <td>${index + 1}</td>
+              <td><a href="${result.url}" target="_blank">${result.url}</a></td>
+              <td>${result.ocorrencias} x 5 = ${result.ocorrencias * 5}</td>
+              <td>${result.linksRecebidos * 10}</td>
+              <td>${result.autoreferencia ? '-15' : '0'}</td>
+              <td>${result.total}</td>
+            </tr>
+          `;
+        });
+
+        tabela += '</tbody></table>';
+        document.getElementById('resultados').innerHTML = tabela;
+        document.getElementById('status').innerText = '✅ Busca concluída';
+        document.getElementById('reiniciar').style.display = 'block';
+
+      } catch (err) {
+        console.error(err);
+        document.getElementById('status').innerText = `❌ Erro na busca`;
+      }
+    });
+
+    // Reiniciar tudo
+    document.getElementById('reiniciar').addEventListener('click', () => {
+      document.getElementById('urlForm').reset();
+      document.getElementById('termoForm').reset();
+      document.getElementById('urlForm').style.display = 'block';
+      document.getElementById('termoForm').style.display = 'none';
+      document.getElementById('reiniciar').style.display = 'none';
+      document.getElementById('status').innerText = '';
+      document.getElementById('resultados').innerHTML = '';
+      paginasCarregadas = false;
+    });
+  </script>
 </body>
-
 </html>
